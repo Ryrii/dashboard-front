@@ -6,8 +6,9 @@ import { ChartComponent } from '../components/ChartComponent';
 import { StoreListComponent } from '../components/StoreListComponent';
 import { TopManufacturersComponent } from '../components/TopManufacturersComponent';
 import { CategoryShareComponent } from '../components/CategoryShareComponent';
-import { getManufacturerData, getTopStores, getTopSellers, searchSeller, getTopManufacturerShare, getCategoriesParts } from '../services/api';
-
+import { CompetitorsEvolutionChart } from '../components/CompetitorsEvolutionChart';
+import { ProductsEvolutionChart } from '../components/ProductsEvolutionChart';
+import { getManufacturerData, getTopStores, getTopSellers, searchSeller, getTopManufacturerShare, getCategoriesParts, getCompetitorsCount, getCompetitorsWithSales, getCompetitorsWithSalesInTop10, getAverageProductsPerManufacturer, getAverageProductsPerManufacturerWithSales, getAverageProductsPerManufacturerWithSalesAll } from '../services/api';
 
 export const Dashboard: React.FC = () => {
   const [manufacturer, setManufacturer] = useState('');
@@ -19,15 +20,20 @@ export const Dashboard: React.FC = () => {
   const [manufacturerSalesinTop10Stores, setManufacturerSalesinTop10Stores] = useState(0);
   const [topManufacturers, setTopManufacturers] = useState<any[]>([]);
   const [categoriesParts, setCategoriesParts] = useState<any[]>([]);
+  const [competitorsCount, setCompetitorsCount] = useState(0);
+  const [competitorsWithSales, setCompetitorsWithSales] = useState(0);
+  const [competitorsWithSalesInTop10, setCompetitorsWithSalesInTop10] = useState(0);
+  const [averageProducts, setAverageProducts] = useState(0);
+  const [averageProductsWithSales, setAverageProductsWithSales] = useState(0);
+  const [averageProductsWithSalesAll, setAverageProductsWithSalesAll] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      //   const result = await getManufacturerData(manufacturer, category, period);
-      //   setData(result);
       const categoriesPartsData = await getCategoriesParts();
       setCategoriesParts(categoriesPartsData);
-      if (manufacturer && category ) {
-        const topStores = await getTopStores(category,manufacturer);
+
+      if (manufacturer && category) {
+        const topStores = await getTopStores(category, manufacturer);
         const transformedTopStores = topStores.map((store: any) => ({
           name: `Mag${store.magID}`,
           sales: store.product_count,
@@ -44,21 +50,35 @@ export const Dashboard: React.FC = () => {
           total_sales_fab: manufacturer.total_sales_fab
         }));
         setTopManufacturers(transformedTopManufacturers);
+
+        const competitorsCountData = await getCompetitorsCount(category);
+        setCompetitorsCount(competitorsCountData);
+
+        const competitorsWithSalesData = await getCompetitorsWithSales(category);
+        setCompetitorsWithSales(competitorsWithSalesData);
+
+        const competitorsWithSalesInTop10Data = await getCompetitorsWithSalesInTop10(category);
+        setCompetitorsWithSalesInTop10(competitorsWithSalesInTop10Data);
+
+        const averageProductsData = await getAverageProductsPerManufacturer(category);
+        setAverageProducts(averageProductsData.toFixed(1));
+
+        const averageProductsWithSalesData = await getAverageProductsPerManufacturerWithSales(category);
+        setAverageProductsWithSales(averageProductsWithSalesData.toFixed(1));
+
+        const averageProductsWithSalesAllData = await getAverageProductsPerManufacturerWithSalesAll(category);
+        setAverageProductsWithSalesAll(averageProductsWithSalesAllData.toFixed(1));
       }
-      // console.log(transformedTopStores);
-      
-      
-      
     };
     fetchData();
   }, [manufacturer, category, period]);
 
   useEffect(() => {
-    if (top10StoresSales) {
-      console.log('top10StoresSales:', top10StoresSales);
-      console.log('manufacturerSalesinTop10Stores:', manufacturerSalesinTop10Stores);
-      
-    }
+    // if (top10StoresSales) {
+    //   console.log('top10StoresSales:', top10StoresSales);
+    //   console.log('manufacturerSalesinTop10Stores:', manufacturerSalesinTop10Stores);
+    // }
+    // console.log(competitorsCount, competitorsWithSales, competitorsWithSalesInTop10, averageProducts, averageProductsWithSales, averageProductsWithSalesAll);
   }, [top10StoresSales]);
 
   return (
@@ -69,21 +89,29 @@ export const Dashboard: React.FC = () => {
         <FilterComponent
           onManufacturerChange={setManufacturer}
           onCategoryChange={setCategory}
-          onPeriodChange={setPeriod}
+          // onPeriodChange={setPeriod}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <KPICard
-            title="Nombre de concurrents"
-            value={data?.competitors || 0}
+            title="Concurrents"
+            values={{
+              main: competitorsCount,
+              withSales: competitorsWithSales,
+              withSalesInTop10: competitorsWithSalesInTop10
+            }}
             icon="competitors"
-            trend={5}
+            category={category}
           />
           <KPICard
             title="Produits par fabricant"
-            value={data?.averageProducts || 0}
+            values={{
+              main: averageProducts,
+              withSales: averageProductsWithSales,
+              withSalesInTop10: averageProductsWithSalesAll
+            }}
             icon="products"
-            trend={-2}
+            category={category}
           />
         </div>
 
@@ -95,29 +123,30 @@ export const Dashboard: React.FC = () => {
             setTop10StoresSales={setTotalSales}
             manufacturerSalesinTop10Stores={manufacturerSalesinTop10Stores}
             setManufacturerSalesinTop10Stores={setManufacturerSalesinTop10Stores}
+            category={category}
           />
           <TopManufacturersComponent
-          data={topManufacturers}
-          top10StoresSales={top10StoresSales}
-          selectedManufacturer={manufacturer}
-          selectedCategory={category}
-        />
-          
+            data={topManufacturers}
+            top10StoresSales={top10StoresSales}
+            selectedManufacturer={manufacturer}
+            selectedCategory={category}
+          />
         </div>
 
-        
         <CategoryShareComponent
-            data={categoriesParts || []}
-            title="Répartition des ventes par catégorie"
-          />
-          <ChartComponent
-            type="pie"
-            data={data?.healthScore || []}
-            dataKey="value"
-            nameKey="name"
-            title="Score de santé"
-          />
+          data={categoriesParts || []}
+          title="Répartition des ventes par catégorie"
+        />
 
+
+        <CompetitorsEvolutionChart 
+          category={category}
+        />
+        
+        <ProductsEvolutionChart 
+          category={category}
+        />
+        
         <div className="bg-white p-4 rounded-lg shadow-md">
           <div className="flex items-center gap-2 mb-4">
             <Search className="w-5 h-5 text-gray-500" />

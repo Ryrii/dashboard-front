@@ -14,9 +14,10 @@ interface StoreListProps {
   setTop10StoresSales: (value: number) => void;
   manufacturerSalesinTop10Stores: number;
   setManufacturerSalesinTop10Stores: (value: number) => void;
+  category: string;
 }
 
-export const StoreListComponent: React.FC<StoreListProps> = ({ data, title, setTop10StoresSales,setManufacturerSalesinTop10Stores }) => {
+export const StoreListComponent: React.FC<StoreListProps> = ({ data, title, setTop10StoresSales,setManufacturerSalesinTop10Stores,category }) => {
 //   console.log("data", data);
   
   const maxSales = Math.max(...data.map(store => store.sales));
@@ -35,7 +36,7 @@ React.useEffect(() => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Store className="w-6 h-6 text-blue-600" />
-          <h3 className="text-lg font-semibold">{title}</h3>
+          <h3 className="text-lg font-semibold">{title}  {category=="all"?' toutes catégories':'de la categorie '+category}</h3>
         </div>
         <span className="text-lg font-medium text-green-600">Part fabricant: {averageManufacturerShare}%</span>
       </div>

@@ -3,12 +3,13 @@ import { TrendingUp, Users, Package } from 'lucide-react';
 
 interface KPICardProps {
   title: string;
-  value: number | string;
+  values: { main: number , withSales: number | string, withSalesInTop10: number | string };
   icon: 'competitors' | 'products';
   trend?: number;
+  category: string;
 }
 
-export const KPICard: React.FC<KPICardProps> = ({ title, value, icon, trend }) => {
+export const KPICard: React.FC<KPICardProps> = ({ title, values, icon, trend,category }) => {
   const getIcon = () => {
     switch (icon) {
       case 'competitors':
@@ -22,6 +23,7 @@ export const KPICard: React.FC<KPICardProps> = ({ title, value, icon, trend }) =
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
+      <div></div>
       <div className="flex items-center justify-between mb-4">
         <div className="p-2 bg-gray-100 rounded-full">{getIcon()}</div>
         {trend && (
@@ -33,8 +35,12 @@ export const KPICard: React.FC<KPICardProps> = ({ title, value, icon, trend }) =
           </div>
         )}
       </div>
-      <h3 className="text-gray-600 text-sm">{title}</h3>
-      <p className="text-2xl font-bold mt-1">{value}</p>
+      <h3 className="text-gray-600 text-sm">{title} {category=="all"?'dans toutes catégories':'dans la categorie '+category}</h3>
+      <p className="text-2xl font-bold mt-1">{values.main}</p>
+      <h4 className="text-gray-500 text-sm">avec ventes :</h4>
+      <p className="text-xl mt-1">{values.withSales}</p>
+      <h4 className="text-gray-500 text-sm">avec ventes dans top10Mag :</h4>
+      <p className="text-xl mt-1">{values.withSalesInTop10}</p>
     </div>
   );
 };

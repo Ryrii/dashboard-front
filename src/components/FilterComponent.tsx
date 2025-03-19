@@ -6,13 +6,13 @@ import { getCategories } from '../services/api';
 interface FilterProps {
   onManufacturerChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
-  onPeriodChange: (value: string) => void;
+  // onPeriodChange: (value: string) => void;
 }
 
 export const FilterComponent: React.FC<FilterProps> = ({
   onManufacturerChange,
   onCategoryChange,
-  onPeriodChange
+  // onPeriodChange
 }) => {
   const [manufacturers, setManufacturers] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -63,7 +63,7 @@ export const FilterComponent: React.FC<FilterProps> = ({
           <option value="all">Toutes les catégories</option>
         </select>
 
-        <select
+        {/* <select
           onChange={(e) => onPeriodChange(e.target.value)}
           className="p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
         >
@@ -71,7 +71,7 @@ export const FilterComponent: React.FC<FilterProps> = ({
           <option value="3M">3 Mois</option>
           <option value="6M">6 Mois</option>
           <option value="1Y">1 An</option>
-        </select>
+        </select> */}
       </div>
     </div>
   );

@@ -56,3 +56,108 @@ export const searchSeller = async (query: string) => {
   });
   return response.data;
 };
+
+export const getCompetitorsCount = async (catId: string, startDate?: string, endDate?: string) => {
+  if (catId == 'all') {
+    var url = `api/competitors_count`;
+    if (startDate && endDate) {
+      url = url+`/?&start_date=${startDate}&end_date=${endDate}`
+    }
+  }else {
+    var url = `api/competitors_count/?&cat_id=${catId}`;
+    if (startDate && endDate) {
+      url = url+`&start_date=${startDate}&end_date=${endDate}`
+    }
+  }
+  var response = await api.get(url);
+  console.log(url);
+  
+  console.log(response.data.competitors_count);
+  
+  return response.data.competitors_count;
+};
+
+export const getCompetitorsWithSales = async (catId: string, startDate?: string, endDate?: string) => {
+  if (catId == 'all') {
+    var url = `api/competitors_with_sales`;
+    if (startDate && endDate) {
+      url = url+`/?&start_date=${startDate}&end_date=${endDate}`
+    }
+  }else {
+    var url = `api/competitors_with_sales/?&cat_id=${catId}`;
+    if (startDate && endDate) {
+      url = url+`&start_date=${startDate}&end_date=${endDate}`
+    }
+  }
+  
+  var response = await api.get(url);
+  return response.data.competitors_with_sales_count;
+};
+
+export const getCompetitorsWithSalesInTop10 = async (catId: string, startDate?: string, endDate?: string) => {
+  if (catId == 'all') {
+    var url = `api/competitors_with_sales_in_top10`;
+    if (startDate && endDate) {
+      url = url+`/?&start_date=${startDate}&end_date=${endDate}`
+    }
+  }else {
+    var url = `api/competitors_with_sales_in_top10/?&cat_id=${catId}`;
+    if (startDate && endDate) {
+      url = url+`&start_date=${startDate}&end_date=${endDate}`
+    }
+  }
+
+  var response = await api.get(url);
+  return response.data.competitors_with_sales_in_top10_count;
+};
+
+export const getAverageProductsPerManufacturer = async (catId: string, startDate?: string, endDate?: string) => {
+  if (catId == 'all') {
+    var url = `api/average_products_per_manufacturer`;
+    if (startDate && endDate) {
+      url = url+`/?&start_date=${startDate}&end_date=${endDate}`
+    }
+  }else {
+    var url = `api/average_products_per_manufacturer/?&cat_id=${catId}`;
+    if (startDate && endDate) {
+      url = url+`&start_date=${startDate}&end_date=${endDate}`
+    }
+  }
+
+  var response = await api.get(url);
+  return response.data.average_products_per_manufacturer;
+};
+
+export const getAverageProductsPerManufacturerWithSales = async (catId: string, startDate?: string, endDate?: string) => {
+  if (catId == 'all') {
+    var url = `api/average_products_per_manufacturer_with_sales`;
+    if (startDate && endDate) {
+      url = url+`/?&start_date=${startDate}&end_date=${endDate}`
+    }
+  }else {
+    var url = `api/average_products_per_manufacturer_with_sales/?&cat_id=${catId}`;
+    if (startDate && endDate) {
+      url = url+`&start_date=${startDate}&end_date=${endDate}`
+    }
+  }
+
+  var response = await api.get(url);
+  return response.data.average_products_per_manufacturer_with_sales;
+};
+
+export const getAverageProductsPerManufacturerWithSalesAll = async (catId: string, startDate?: string, endDate?: string) => {
+  if (catId == 'all') {
+    var url = `api/average_products_per_manufacturer_with_sales_in_top10`;
+    if (startDate && endDate) {
+      url = url+`/?&start_date=${startDate}&end_date=${endDate}`
+    }
+  }else {
+    var url = `api/average_products_per_manufacturer_with_sales_in_top10/?&cat_id=${catId}`;
+    if (startDate && endDate) {
+      url = url+`&start_date=${startDate}&end_date=${endDate}`
+    }
+  }
+
+  var response = await api.get(url);
+  return response.data.average_products_per_manufacturer_with_sales_in_top10;
+};

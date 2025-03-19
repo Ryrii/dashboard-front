@@ -45,7 +45,7 @@ export const TopManufacturersComponent: React.FC<TopManufacturersProps> = ({ dat
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold">Top Fabricants dans le top 10 magasins de la catégorie {selectedCategory}</h3>
+          <h3 className="text-lg font-semibold">Top Fabricants dans le top 10 magasins {selectedCategory=="all"?' toutes catégories':'de la categorie '+selectedCategory}</h3>
         </div>
         <span className="text-lg font-medium text-green-600">Total ventes: {top10StoresSales}</span> 
       </div>
