@@ -18,16 +18,20 @@ export const FilterComponent: React.FC<FilterProps> = ({
   const [categoryInput, setCategoryInput] = useState('');
   const [showManufacturers, setShowManufacturers] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
+  const [loadingManufacturers, setLoadingManufacturers] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   useEffect(() => {
     const fetchManufacturers = async () => {
       const result = await getManufacturers();
       setManufacturers(result);
+      setLoadingManufacturers(false);
     };
     fetchManufacturers();
     const fetchCategories = async () => {
       const result = await getCategories();
       setCategories(result);
+      setLoadingCategories(false);
     }
     fetchCategories();
   }, []);
@@ -59,19 +63,23 @@ export const FilterComponent: React.FC<FilterProps> = ({
           />
           {showManufacturers && (
             <ul className="absolute bg-white border rounded-md mt-1 w-full max-h-40 overflow-y-auto">
-              {filteredManufacturers.map((manufacturer) => (
-                <li
-                  key={manufacturer}
-                  onClick={() => {
-                    onManufacturerChange(manufacturer.toString());
-                    setManufacturerInput(manufacturer.toString());
-                    setShowManufacturers(false);
-                  }}
-                  className="p-2 cursor-pointer hover:bg-gray-200"
-                >
-                  {'Fab' + manufacturer}
-                </li>
-              ))}
+              {loadingManufacturers ? (
+                <li className="p-2">Chargement...</li>
+              ) : (
+                filteredManufacturers.map((manufacturer) => (
+                  <li
+                    key={manufacturer}
+                    onClick={() => {
+                      onManufacturerChange(manufacturer.toString());
+                      setManufacturerInput(manufacturer.toString());
+                      setShowManufacturers(false);
+                    }}
+                    className="p-2 cursor-pointer hover:bg-gray-200"
+                  >
+                    {'Fab' + manufacturer}
+                  </li>
+                ))
+              )}
             </ul>
           )}
         </div>
@@ -88,29 +96,35 @@ export const FilterComponent: React.FC<FilterProps> = ({
           />
           {showCategories && (
             <ul className="absolute bg-white border rounded-md mt-1 w-full max-h-40 overflow-y-auto">
-              {filteredCategories.map((category) => (
-                <li
-                  key={category}
-                  onClick={() => {
-                    onCategoryChange(category.toString());
-                    setCategoryInput(category.toString());
-                    setShowCategories(false);
-                  }}
-                  className="p-2 cursor-pointer hover:bg-gray-200"
-                >
-                  {category}
-                </li>
-              ))}
-              <li
-                onClick={() => {
-                  onCategoryChange('all');
-                  setCategoryInput('Toutes les catégories');
-                  setShowCategories(false);
-                }}
-                className="p-2 cursor-pointer hover:bg-gray-200"
-              >
-                Toutes les catégories
-              </li>
+              {loadingCategories ? (
+                <li className="p-2">Chargement...</li>
+              ) : (
+                <>
+                  {filteredCategories.map((category) => (
+                    <li
+                      key={category}
+                      onClick={() => {
+                        onCategoryChange(category.toString());
+                        setCategoryInput(category.toString());
+                        setShowCategories(false);
+                      }}
+                      className="p-2 cursor-pointer hover:bg-gray-200"
+                    >
+                      {category}
+                    </li>
+                  ))}
+                  <li
+                    onClick={() => {
+                      onCategoryChange('all');
+                      setCategoryInput('Toutes les catégories');
+                      setShowCategories(false);
+                    }}
+                    className="p-2 cursor-pointer hover:bg-gray-200"
+                  >
+                    Toutes les catégories
+                  </li>
+                </>
+              )}
             </ul>
           )}
         </div>
