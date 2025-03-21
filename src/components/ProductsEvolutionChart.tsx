@@ -11,12 +11,12 @@ const summerSalesEnd = new Date('2022-07-31');
 
 export const ProductsEvolutionChart: React.FC<any> = ({ category }) => {
   const [startDate, setStartDate] = useState(new Date('2022-01-01'));
-  const [endDate, setEndDate] = useState(new Date('2022-05-01'));
+  const [endDate, setEndDate] = useState(new Date('2023-01-16'));
   const [data, setData] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [interval, setInterval] = useState(10);
-  const [tempInterval, setTempInterval] = useState(10);
+  const [interval, setInterval] = useState(30);
+  const [tempInterval, setTempInterval] = useState(30);
   const [selectedLines, setSelectedLines] = useState({
     products: true,
     productsWithSales: true,
@@ -201,10 +201,6 @@ export const ProductsEvolutionChart: React.FC<any> = ({ category }) => {
             <span>Produits dans le top 10</span>
           </div>
         </div>
-      </div>
-      <div className="flex justify-between mt-4">
-        <span>Date de début: {startDate.toISOString().split('T')[0]}</span>
-        <span>Date de fin: {endDate.toISOString().split('T')[0]}</span>
       </div>
     </div>
   );

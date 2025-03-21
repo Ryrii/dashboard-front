@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getTopManufacturerShare } from '../services/api';
 
 interface ManufacturerData {
   fabID: string;
@@ -6,25 +7,40 @@ interface ManufacturerData {
 }
 
 interface TopManufacturersProps {
-  data: ManufacturerData[];
-  top10StoresSales: number;
   selectedManufacturer: string;
   selectedCategory: string;
+  intop10StoresSales: boolean;
 }
 
-export const TopManufacturersComponent: React.FC<TopManufacturersProps> = ({ data, top10StoresSales, selectedManufacturer,selectedCategory }) => {
+export const TopManufacturersComponent: React.FC<TopManufacturersProps> = ({ selectedManufacturer, selectedCategory, intop10StoresSales }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
   const [sortedData, setSortedData] = useState<ManufacturerData[]>([]);
   const [selectedManufacturerData, setSelectedManufacturerData] = useState<ManufacturerData | null>(null);
+  const [topManufacturers, setTopManufacturers] = useState<ManufacturerData[]>([]);
+  const [totalSales, setTotalSales] = useState(0);
 
   useEffect(() => {
-    const sorted = [...data].sort((a, b) => b.total_sales_fab - a.total_sales_fab);
-    setSortedData(sorted);
+    const fetchData = async () => {
+      const topManufacturersData = await getTopManufacturerShare(selectedCategory, intop10StoresSales);
+      const transformedTopManufacturers = topManufacturersData.map((manufacturer: any) => ({
+        fabID: manufacturer.fabID,
+        total_sales_fab: manufacturer.total_sales_fab
+      }));
+      setTopManufacturers(transformedTopManufacturers);
 
-    const selectedData = sorted.find(manufacturer => manufacturer.fabID == selectedManufacturer);
-    setSelectedManufacturerData(selectedData || null);
-  }, [data, selectedManufacturer]);
+      const sorted = [...transformedTopManufacturers].sort((a, b) => b.total_sales_fab - a.total_sales_fab);
+      setSortedData(sorted);
+
+      const selectedData = sorted.find(manufacturer => manufacturer.fabID == selectedManufacturer);
+      setSelectedManufacturerData(selectedData || null);
+
+      const totalSales = transformedTopManufacturers.reduce((sum:any, manufacturer:any) => sum + manufacturer.total_sales_fab, 0);
+      setTotalSales(totalSales);
+    };
+
+    fetchData();
+  }, [selectedManufacturer, selectedCategory, intop10StoresSales]);
 
   const handleNext = () => {
     if ((currentPage + 1) * itemsPerPage < sortedData.length) {
@@ -45,11 +61,11 @@ export const TopManufacturersComponent: React.FC<TopManufacturersProps> = ({ dat
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold">Top Fabricants dans le top 10 magasins {selectedCategory=="all"?' toutes catégories':'de la categorie '+selectedCategory}</h3>
+          <h3 className="text-lg font-semibold">Classement Fabricants {intop10StoresSales?'dans le top 10 magasins ':''}{selectedCategory === "all" ? ' toutes catégories' : 'de la categorie ' + selectedCategory}</h3>
         </div>
-        <span className="text-lg font-medium text-green-600">Total ventes: {top10StoresSales}</span> 
+        <span className="text-lg font-medium text-green-600">Total ventes: {totalSales}</span>
       </div>
-      
+
       <div className="space-y-4">
         {visibleData.map((manufacturer, index) => (
           <div key={manufacturer.fabID} className="relative">
@@ -63,12 +79,12 @@ export const TopManufacturersComponent: React.FC<TopManufacturersProps> = ({ dat
                       {manufacturer.total_sales_fab.toLocaleString()} ventes
                     </span>
                     <span className="text-sm font-medium text-green-600">
-                      {((manufacturer.total_sales_fab / top10StoresSales) * 100).toFixed(2)}%
+                      {((manufacturer.total_sales_fab / totalSales) * 100).toFixed(2)}%
                     </span>
                   </div>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
-                  <div className="h-full bg-blue-600 rounded-full relative" style={{ width: `${(manufacturer.total_sales_fab / top10StoresSales) * 100}%` }} />
+                  <div className="h-full bg-blue-600 rounded-full relative" style={{ width: `${(manufacturer.total_sales_fab / totalSales) * 100}%` }} />
                 </div>
               </div>
             </div>
@@ -86,12 +102,12 @@ export const TopManufacturersComponent: React.FC<TopManufacturersProps> = ({ dat
                       {selectedManufacturerData.total_sales_fab.toLocaleString()} ventes
                     </span>
                     <span className="text-sm font-medium text-green-600">
-                      {((selectedManufacturerData.total_sales_fab / top10StoresSales) * 100).toFixed(2)}%
+                      {((selectedManufacturerData.total_sales_fab / totalSales) * 100).toFixed(2)}%
                     </span>
                   </div>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
-                  <div className="h-full bg-blue-600 rounded-full relative" style={{ width: `${(selectedManufacturerData.total_sales_fab / top10StoresSales) * 100}%` }} />
+                  <div className="h-full bg-blue-600 rounded-full relative" style={{ width: `${(selectedManufacturerData.total_sales_fab / totalSales) * 100}%` }} />
                 </div>
               </div>
             </div>

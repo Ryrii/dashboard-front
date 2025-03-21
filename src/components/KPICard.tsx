@@ -1,15 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TrendingUp, Users, Package } from 'lucide-react';
+import { getAverageProductsPerManufacturer, getAverageProductsPerManufacturerWithSales, getAverageProductsPerManufacturerWithSalesAll } from '../services/api';
 
 interface KPICardProps {
   title: string;
-  values: { main: number , withSales: number | string, withSalesInTop10: number | string };
+  allValues: { main: number , withSales: number | string, withSalesInTop10: number | string };
   icon: 'competitors' | 'products';
   trend?: number;
   category: string;
+  fabId?: string;
 }
 
-export const KPICard: React.FC<KPICardProps> = ({ title, values, icon, trend,category }) => {
+export const KPICard: React.FC<KPICardProps> = ({ title, allValues, icon, trend, category, fabId }) => {
+  const [productValues, setProductValues] = useState({ main: 0, withSales: 0, withSalesInTop10: 0 });
+
+  useEffect(() => {
+    if (icon === 'products') {
+      const fetchData = async () => {
+        const main = await getAverageProductsPerManufacturer(category, undefined, undefined, fabId);
+        const withSales = await getAverageProductsPerManufacturerWithSales(category, undefined, undefined, fabId);
+        const withSalesInTop10 = await getAverageProductsPerManufacturerWithSalesAll(category, undefined, undefined, fabId);
+        setProductValues({ main, withSales, withSalesInTop10 });
+      };
+      fetchData();
+    }
+  }, [category, fabId, icon]);
+
   const getIcon = () => {
     switch (icon) {
       case 'competitors':
@@ -36,11 +52,22 @@ export const KPICard: React.FC<KPICardProps> = ({ title, values, icon, trend,cat
         )}
       </div>
       <h3 className="text-gray-600 text-sm">{title} {category=="all"?'dans toutes catégories':'dans la categorie '+category}</h3>
-      <p className="text-2xl font-bold mt-1">{values.main}</p>
-      <h4 className="text-gray-500 text-sm">avec ventes :</h4>
-      <p className="text-xl mt-1">{values.withSales}</p>
-      <h4 className="text-gray-500 text-sm">avec ventes dans top10Mag :</h4>
-      <p className="text-xl mt-1">{values.withSalesInTop10}</p>
+      <div className="flex justify-between">
+        <div>
+          <p className="text-2xl font-bold mt-1">{allValues.main}
+          {icon === 'products' && (<span className="text-green-600 text-2xl font-bold mt-1"> ({productValues.main})</span>)}
+          </p>
+          
+          <h4 className="text-gray-500 text-sm">avec ventes :</h4>
+          <p className="text-xl mt-1">{allValues.withSales}
+          {icon === 'products' && (<span className="text-green-600 text-xl  mt-1"> ({productValues.withSales})</span>)}
+          </p>
+          <h4 className="text-gray-500 text-sm">avec ventes dans top10Mag :</h4>
+          <p className="text-xl mt-1">{allValues.withSalesInTop10}
+          {icon === 'products' && (<span className="text-green-600 text-xl  mt-1"> ({productValues.withSalesInTop10})</span>)}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
